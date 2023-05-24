@@ -25,13 +25,19 @@ public class ThingController {
 
     @GetMapping
     public ResponseEntity<List<ThingResponseDto>> getAll() {
-        var things = service.getAll();
+        var things = service.getAll()
+                .stream()
+                .map(ThingResponseDto::new)
+                .toList();
         return new ResponseEntity<>(things, HttpStatus.OK);
     }
 
     @GetMapping("/{description}")
     public ResponseEntity<List<ThingResponseDto>> getByDescription(@PathVariable("description") String description) {
-        var things = service.getByDescription(description);
+        var things = service.getByDescription(description)
+                .stream()
+                .map(ThingResponseDto::new)
+                .toList();
         return new ResponseEntity<>(things, HttpStatus.OK);
     }
 
@@ -41,28 +47,18 @@ public class ThingController {
         return new ResponseEntity<>(thing, HttpStatus.CREATED);
     }
 
-//    @GetMapping("/readFromExcel")
-//    public ResponseEntity<List<AnythingRequestDto>> readFromExcel() {
-//        var anythings = service.getListFromExcel();
-//        return new ResponseEntity<>(anythings, HttpStatus.OK);
-//    }
-
-//    @GetMapping("/saveFromExcel")
-//    public ResponseEntity<List<AnythingRequestDto>> saveFromExcel() {
-//        var anythings = service.getListFromExcel();
-//        anythings.stream().forEach(service::save);
-//        return new ResponseEntity<>(anythings, HttpStatus.OK);
-//    }
-
     @PostMapping("/saveFromExcel")
     public ResponseEntity<List<ThingRequestDto>> saveFromExcel(@RequestParam("file") MultipartFile file) {
-        List<ThingRequestDto> things = service.getListFromExcel(file);
+        var things = service.getListFromExcel(file)
+                .stream()
+                .map(ThingRequestDto::new)
+                .toList();
         things.forEach(service::save);
         return new ResponseEntity<>(things, HttpStatus.CREATED);
     }
 
 //    @PutMapping("/update")
-//    public ResponseEntity<Anything> update(@RequestBody AnythingRequestDto anythingRequestDto) {
+//    public ResponseEntity<Thing> update(@RequestBody AnythingRequestDto anythingRequestDto) {
 //         return null;
 //    }
 

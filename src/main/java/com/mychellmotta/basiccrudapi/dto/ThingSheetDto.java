@@ -5,7 +5,7 @@ import com.poiji.annotation.ExcelRow;
 import lombok.Getter;
 
 @Getter
-public class ThingSheet {
+public class ThingSheetDto {
 
     @ExcelRow
     private int rowIndex;

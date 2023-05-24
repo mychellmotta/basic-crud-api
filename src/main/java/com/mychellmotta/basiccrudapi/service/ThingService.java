@@ -1,8 +1,7 @@
 package com.mychellmotta.basiccrudapi.service;
 
 import com.mychellmotta.basiccrudapi.dto.ThingRequestDto;
-import com.mychellmotta.basiccrudapi.dto.ThingResponseDto;
-import com.mychellmotta.basiccrudapi.dto.ThingSheet;
+import com.mychellmotta.basiccrudapi.dto.ThingSheetDto;
 import com.mychellmotta.basiccrudapi.model.Thing;
 import com.mychellmotta.basiccrudapi.repository.ThingRepository;
 import com.poiji.bind.Poiji;
@@ -21,26 +20,18 @@ import static com.mychellmotta.basiccrudapi.utils.Utils.convertMultiPartToFile;
 @Service
 public class ThingService {
 
-//    @Value("${filePath}")
-//    public String FILE_PATH;
     private final ThingRepository repository;
 
     public ThingService(ThingRepository repository) {
         this.repository = repository;
     }
 
-    public List<ThingResponseDto> getAll() {
-        return repository.findAll()
-                .stream()
-                .map(ThingResponseDto::new)
-                .toList();
+    public List<Thing> getAll() {
+        return repository.findAll();
     }
 
-    public List<ThingResponseDto> getByDescription(String description) {
-        return repository.hasDescription(description)
-                .stream()
-                .map(ThingResponseDto::new)
-                .toList();
+    public List<Thing> getByDescription(String description) {
+        return repository.hasDescription(description);
     }
 
     @Transactional
@@ -55,7 +46,7 @@ public class ThingService {
         return repository.save(new Thing(thingRequestDto));
     }
 
-    public List<ThingRequestDto> getListFromExcel(MultipartFile multipartfile) {
+    public List<ThingSheetDto> getListFromExcel(MultipartFile multipartfile) {
         File file;
         try {
             file = convertMultiPartToFile(multipartfile);
@@ -63,21 +54,16 @@ public class ThingService {
             throw new RuntimeException(e);
         }
 
-        List<ThingSheet> things = Poiji.fromExcel(file, ThingSheet.class);
-        return things
-                .stream()
-                .map(ThingRequestDto::new)
-                .toList();
+        return Poiji.fromExcel(file, ThingSheetDto.class);
     }
 
+    @Transactional
     public void delete(UUID id) {
         Optional<Thing> optionalThing = repository.findById(id);
         if (optionalThing.isEmpty()) {
-            throw new RuntimeException("can't find a thing with this id");
+            throw new IllegalStateException("can't find a thing with this id");
         }
 
         repository.deleteById(id);
     }
-
-
 }
