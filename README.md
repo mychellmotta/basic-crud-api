@@ -12,7 +12,7 @@ This is a basic CRUD REST API being made with Java 17, Spring Boot and in-memory
   
     ![image](https://github.com/mychellmotta/basic-crud-api/assets/13575346/9d6653e1-1a7f-4378-bdc3-75ec575f8415)
   
-* [DELETE] Delete an entity by its ID (type: UUID): http://localhost:8080/delete/{id}
+* [DELETE] Delete an entity by its ID (type: UUID): http://localhost:8080/thing/delete/{id}
 
 ### To do:
 

@@ -3,7 +3,9 @@ package com.mychellmotta.basiccrudapi.controller;
 import com.mychellmotta.basiccrudapi.dto.ThingRequestDto;
 import com.mychellmotta.basiccrudapi.dto.ThingResponseDto;
 import com.mychellmotta.basiccrudapi.model.Thing;
+import com.mychellmotta.basiccrudapi.service.EmailService;
 import com.mychellmotta.basiccrudapi.service.ThingService;
+import jakarta.mail.MessagingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,24 +19,34 @@ import java.util.UUID;
 @CrossOrigin("*")
 public class ThingController {
 
-    private final ThingService service;
+    private final ThingService thingService;
+    private final EmailService emailService;
 
-    public ThingController(ThingService service) {
-        this.service = service;
+    public ThingController(ThingService thingService, EmailService emailService) {
+        this.thingService = thingService;
+        this.emailService = emailService;
     }
 
     @GetMapping
     public ResponseEntity<List<ThingResponseDto>> getAll() {
-        var things = service.getAll()
+        var things = thingService.getAll()
                 .stream()
                 .map(ThingResponseDto::new)
                 .toList();
+
+        // testing the email function
+        try {
+            emailService.sendEmail("message here");
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+
         return new ResponseEntity<>(things, HttpStatus.OK);
     }
 
     @GetMapping("/{description}")
     public ResponseEntity<List<ThingResponseDto>> getByDescription(@PathVariable("description") String description) {
-        var things = service.getByDescription(description)
+        var things = thingService.getByDescription(description)
                 .stream()
                 .map(ThingResponseDto::new)
                 .toList();
@@ -43,28 +55,29 @@ public class ThingController {
 
     @PostMapping("/save")
     public ResponseEntity<Thing> save(@RequestBody ThingRequestDto thingRequestDto) {
-        var thing = service.save(thingRequestDto);
+        var thing = thingService.save(thingRequestDto);
         return new ResponseEntity<>(thing, HttpStatus.CREATED);
     }
 
     @PostMapping("/saveFromExcel")
     public ResponseEntity<List<ThingRequestDto>> saveFromExcel(@RequestParam("file") MultipartFile file) {
-        var things = service.getListFromExcel(file)
+        var things = thingService.getListFromExcel(file)
                 .stream()
                 .map(ThingRequestDto::new)
                 .toList();
-        things.forEach(service::save);
+        things.forEach(thingService::save);
         return new ResponseEntity<>(things, HttpStatus.CREATED);
     }
 
-//    @PutMapping("/update")
-//    public ResponseEntity<Thing> update(@RequestBody AnythingRequestDto anythingRequestDto) {
-//         return null;
-//    }
+    // TODO
+    @PutMapping("/update")
+    public ResponseEntity<Thing> update(@RequestBody ThingRequestDto thingRequestDto) {
+         return null;
+    }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") UUID id) {
-        service.delete(id);
+        thingService.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

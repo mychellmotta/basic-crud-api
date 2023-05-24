@@ -10,12 +10,13 @@ import static java.util.Objects.requireNonNull;
 
 public class Utils {
 
-    public static File convertMultiPartToFile(MultipartFile multipartfile) throws IOException {
+    public static File convertMultiPartToFile(MultipartFile multipartFile) throws IOException {
         File file = new File(
-                requireNonNull(multipartfile.getOriginalFilename())
-                    );
+                requireNonNull(multipartFile.getOriginalFilename())
+                            );
+
         FileOutputStream fos = new FileOutputStream(file);
-        fos.write(multipartfile.getBytes());
+        fos.write(multipartFile.getBytes());
         fos.close();
         return file;
     }
