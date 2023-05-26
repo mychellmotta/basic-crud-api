@@ -15,7 +15,7 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
-    public void sendEmail(String test) throws MessagingException {
+    public void sendEmail(String text) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
 
         message.setFrom(new InternetAddress("email here"));
@@ -23,7 +23,7 @@ public class EmailService {
         message.setSubject("Email sent from Spring API");
 
         String htmlContent = "<h1>This is a test Spring Boot email</h1>" +
-                test +
+                text +
                 "<p>It can contain <strong>HTML</strong> content.</p>";
         message.setContent(htmlContent, "text/html; charset=utf-8");
 

@@ -1,11 +1,8 @@
 package com.mychellmotta.basiccrudapi.model;
 
-import com.mychellmotta.basiccrudapi.dto.ThingRequestDto;
+import com.mychellmotta.basiccrudapi.dto.ThingSheetDto;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -13,6 +10,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @EqualsAndHashCode(of = "id")
 public class Thing {
 
@@ -23,8 +21,8 @@ public class Thing {
     @Column(name = "image_url")
     private String imageUrl;
 
-    public Thing(ThingRequestDto thingRequestDto) {
-        this.description = thingRequestDto.description();
-        this.imageUrl = thingRequestDto.imageUrl();
+    public Thing(ThingSheetDto thingSheetDto) {
+        this.description = thingSheetDto.getDescription();
+        this.imageUrl = thingSheetDto.getImageUrl();
     }
 }

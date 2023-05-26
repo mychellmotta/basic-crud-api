@@ -1,6 +1,5 @@
 package com.mychellmotta.basiccrudapi.service;
 
-import com.mychellmotta.basiccrudapi.dto.ThingRequestDto;
 import com.mychellmotta.basiccrudapi.dto.ThingSheetDto;
 import com.mychellmotta.basiccrudapi.model.Thing;
 import com.mychellmotta.basiccrudapi.repository.ThingRepository;
@@ -12,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.mychellmotta.basiccrudapi.utils.Utils.convertMultiPartToFile;
@@ -26,24 +24,29 @@ public class ThingService {
         this.repository = repository;
     }
 
-    public List<Thing> getAll() {
+    public List<Thing> findAll() {
         return repository.findAll();
     }
 
-    public List<Thing> getByDescription(String description) {
+    public List<Thing> findByDescription(String description) {
         return repository.hasDescription(description);
     }
 
     @Transactional
-    public Thing save(ThingRequestDto thingRequestDto) {
+    public Thing save(Thing thing) {
         var thingOptional =
-                repository.findByDescription(thingRequestDto.description());
+                repository.findByDescription(thing.getDescription());
 
         if (thingOptional.isPresent()) {
             throw new IllegalStateException("description already exists");
         }
 
-        return repository.save(new Thing(thingRequestDto));
+        return repository.save(thing);
+    }
+
+    @Transactional
+    public Thing update(Thing thing) {
+        return null;
     }
 
     public List<ThingSheetDto> getListFromExcel(MultipartFile multipartfile) {
@@ -59,10 +62,8 @@ public class ThingService {
 
     @Transactional
     public void delete(UUID id) {
-        Optional<Thing> optionalThing = repository.findById(id);
-        if (optionalThing.isEmpty()) {
-            throw new IllegalStateException("can't find a thing with this id");
-        }
+        repository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("can't find a thing with this id"));
 
         repository.deleteById(id);
     }
