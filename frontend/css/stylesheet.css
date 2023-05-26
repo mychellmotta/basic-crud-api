@@ -1,0 +1,136 @@
+/* CSS styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px 100px; /* Add 20px padding on the top, 100px padding on the right and left, and 20px padding on the bottom */
+}
+
+h1 {
+    text-align: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Stretch the child elements horizontally */
+}
+
+.thing-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    padding-bottom: 10px; /* Add some padding on the bottom */
+    position: relative; /* Add relative positioning to position the line */
+}
+
+.line {
+    flex-shrink: 0; /* Prevent the line div from shrinking */
+    height: 1px;
+    background-color: #ccc;
+    margin-left: 5px;
+    width: calc(100% - 10px); /* Set the width to occupy the available space */
+}
+
+.thing-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    width: 200px;
+    height: 275px;
+    margin-right: 5px; /* Adjust the margin between cards horizontally */
+    margin-bottom: 5px; /* Adjust the margin between cards vertically */
+    flex: 0 0 auto; /* Add this line to prevent flex-shrinking */
+}
+
+.thing-card p {
+    text-align: center; /* Center align the description text */
+}
+
+.thing-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 50%; /* Set border radius to 50% to create a perfect circle */
+    overflow: hidden; /* Hide any overflow outside the circular shape */
+    object-fit: cover; /* Ensure the image covers the entire container without distortion */
+    aspect-ratio: 1/1; /* Maintain a fixed aspect ratio of 1:1 for a perfect circle */
+}
+
+.thing-card.selected {
+    box-shadow: 0 0 5px 2px #0000FF; /* Add a blue box shadow to the selected card */
+    transform: scale(1.05); /* Scale up the selected card slightly */
+    transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out; /* Add a smooth transition effect */
+}
+
+#buttonWrapper {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 20px;
+    padding-right: 50px; /* Adjust the padding to create space from the right side */
+}
+
+#newButton {
+    background-color: green;
+    color: white;
+    padding: 10px 20px; /* Adjust the padding to increase button size */
+    border-radius: 5px; /* Add rounded edges */
+    margin-right: 10px; /* Add margin between the "New" button and "Delete" button */
+}
+
+#deleteButton {
+    background-color: red;
+    color: white;
+    padding: 10px 20px; /* Adjust the padding to increase button size */
+    border-radius: 5px; /* Add rounded edges */
+}
+
+.form-wrapper {
+    display: none;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#newForm label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+#newForm input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+#newForm input[type="submit"] {
+    background-color: green;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#newForm input[type="submit"]:hover {
+    background-color: darkgreen;
+}
+
+#newForm input[type="submit"]:focus {
+    outline: none;
+}
+
+#returnButton {
+    background-color: blue;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+

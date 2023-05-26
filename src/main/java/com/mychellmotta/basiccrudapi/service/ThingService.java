@@ -28,6 +28,11 @@ public class ThingService {
         return repository.findAll();
     }
 
+    public Thing findById(UUID id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("can't find a thing with this id"));
+    }
+
     public List<Thing> findByDescription(String description) {
         return repository.hasDescription(description);
     }
@@ -38,15 +43,21 @@ public class ThingService {
                 repository.findByDescription(thing.getDescription());
 
         if (thingOptional.isPresent()) {
-            throw new IllegalStateException("description already exists");
+            throw new IllegalStateException(
+                    "description: '" + thingOptional.get().getDescription() + "' already exists");
         }
 
         return repository.save(thing);
     }
 
     @Transactional
-    public Thing update(Thing thing) {
-        return null;
+    public Thing update(UUID id, Thing thing) {
+        var existingThing = findById(id);
+
+        existingThing.setDescription(thing.getDescription());
+        existingThing.setImageUrl(thing.getImageUrl());
+
+        return repository.save(existingThing);
     }
 
     public List<ThingSheetDto> getListFromExcel(MultipartFile multipartfile) {
@@ -56,15 +67,14 @@ public class ThingService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        // TODO: do the logic here and return to controller the list of Things
 
         return Poiji.fromExcel(file, ThingSheetDto.class);
     }
 
     @Transactional
     public void delete(UUID id) {
-        repository.findById(id)
-                .orElseThrow(() -> new IllegalStateException("can't find a thing with this id"));
-
-        repository.deleteById(id);
+        var thing = findById(id);
+        repository.delete(thing);
     }
 }
