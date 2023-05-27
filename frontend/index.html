@@ -15,7 +15,7 @@
             <input type="text" id="description" name="description" required>
 
             <label for="imageUrl">Image URL:</label>
-            <input type="text" id="imageUrl" name="imageUrl" required>
+            <input type="text" id="imageUrl" name="imageUrl" required pattern="^(http|https):\/\/[^ ]+$">
 
             <input type="submit" value="Save">
             <button id="returnButton">Return</button>
@@ -26,7 +26,6 @@
     <button id="newButton">New</button>
     <button id="deleteButton">Delete</button>
 </div>
-
 <script src="js/script.js"></script>
 </body>
 </html>
