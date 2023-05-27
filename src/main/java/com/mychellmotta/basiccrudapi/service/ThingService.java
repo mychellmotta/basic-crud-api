@@ -41,7 +41,6 @@ public class ThingService {
     public Thing save(Thing thing) {
         var thingOptional =
                 repository.findByDescription(thing.getDescription());
-
         if (thingOptional.isPresent()) {
             throw new IllegalStateException(
                     "description: '" + thingOptional.get().getDescription() + "' already exists");

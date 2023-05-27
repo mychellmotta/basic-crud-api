@@ -1,183 +1,186 @@
 const apiUrl = "http://localhost:8080/api/v1/things";
 const searchInput = document.getElementById("searchBar");
+const errorMessage = document.getElementById("errorMessage");
+const descriptionInput = document.getElementById("description");
+const imageUrlInput = document.getElementById("imageUrl");
+const newFormWrapper = document.getElementById("newFormWrapper");
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
+  fetchThings();
 
-    // Fetch the initial list of things
-    fetchThings();
+  searchInput.addEventListener("input", () => {
+    const searchTerm = searchInput.value.trim();
+    fetchThings(searchTerm);
+  });
 
-    // Add event listener to the search input
-    searchInput.addEventListener("input", function () {
-        const searchTerm = searchInput.value.trim();
-        fetchThings(searchTerm);
-    });
-
-    // Function to fetch the list of things based on the search term
-    function fetchThings(searchTerm = "") {
-        let url = apiUrl;
-        if (searchTerm !== "") {
-            url += "/findByDescription/" + encodeURIComponent(searchTerm);
-        }
-
-        // Fetch the list of things from the controller
-        fetch(url)
-            .then(response => response.json())
-            .then(things => {
-                const thingList = document.querySelector(".thing-list");
-                thingList.innerHTML = "";
-
-                // Iterate over each thing and create a card
-                things.forEach(thing => {
-                    const card = createThingCard(thing);
-                    addCardToList(card);
-                });
-            })
-            .catch(error => console.log("Error fetching things:", error));
+  function fetchThings(searchTerm = "") {
+    let url = apiUrl;
+    if (searchTerm !== "") {
+      url += `/findByDescription/${encodeURIComponent(searchTerm)}`;
     }
 
-    // Function to create a new Thing card
-    function createThingCard(thing) {
-        const card = document.createElement("div");
-        card.className = "thing-card";
-
-        const description = document.createElement("p");
-        description.textContent = thing.description;
-
-        const image = document.createElement("img");
-        image.title = thing.id;
-
-        // Add an event listener for the error event
-        image.addEventListener("error", function () {
-            // Set the src attribute to the path of the static image
-            image.src = "static/img/noimage.jpg";
-        });
-
-        // Set the src attribute to the provided image URL
-        image.src = thing.imageUrl;
-
-        card.appendChild(description);
-        card.appendChild(image);
-
-        // Add event listener for card selection
-        card.addEventListener("click", function () {
-            handleCardSelection(card);
-        });
-
-        return card;
-    }
-
-    // Function to handle card selection
-    function handleCardSelection(card) {
-        // Remove the "selected" class from all cards
-        const thingCards = document.querySelectorAll(".thing-card");
-        thingCards.forEach(function (c) {
-            c.classList.remove("selected");
-        });
-
-        // Add the "selected" class to the clicked card
-        card.classList.add("selected");
-    }
-
-    // Function to add a new Thing card to the thing list
-    function addCardToList(card) {
+    fetch(url)
+      .then((response) => response.json())
+      .then((things) => {
         const thingList = document.querySelector(".thing-list");
-        thingList.appendChild(card);
-    }
+        thingList.innerHTML = "";
+        things.forEach((thing) => {
+          const card = createThingCard(thing);
+          addCardToList(card);
+        });
+        hideErrorMessage(); // Hide error message on successful fetch
+      })
+      .catch((error) => {
+        console.log("Error fetching things:", error);
+        // Display an error message on the page
+        errorMessage.textContent = "Failed to fetch things. Please try again.";
+        errorMessage.style.display = "block"; // Show the error message
+      });
+  }
 
-    // Add event listener to the form submit event
-    const newForm = document.getElementById("newForm");
+  function createThingCard(thing) {
+    const card = document.createElement("div");
+    card.className = "thing-card";
 
-    newForm.addEventListener("submit", function (event) {
-        event.preventDefault();
+    const description = document.createElement("p");
+    description.textContent = thing.description;
 
-        // Get the form input values
-        const description = document.getElementById("description").value;
-        const imageUrl = document.getElementById("imageUrl").value;
+    const image = document.createElement("img");
+    image.title = thing.id;
+    image.addEventListener("error", () => {
+      image.src = "static/img/noimage.jpg";
+    });
+    image.src = thing.imageUrl;
 
-        // Create a new Thing object
-        const thing = {
-            description,
-            imageUrl
-        };
+    card.appendChild(description);
+    card.appendChild(image);
 
-        // Save the new Thing to the database
-        fetch(apiUrl + "/save", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(thing)
+    card.addEventListener("click", () => {
+      handleCardSelection(card);
+    });
+
+    return card;
+  }
+
+  function handleCardSelection(card) {
+    const thingCards = document.querySelectorAll(".thing-card");
+    thingCards.forEach((c) => {
+      c.classList.remove("selected");
+    });
+    card.classList.add("selected");
+  }
+
+  function addCardToList(card) {
+    const thingList = document.querySelector(".thing-list");
+    thingList.appendChild(card);
+  }
+
+  const newForm = document.getElementById("newForm");
+  newForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const description = descriptionInput.value;
+    const imageUrl = imageUrlInput.value;
+    const thing = {
+      description,
+      imageUrl,
+    };
+
+    // Validate form input
+    if (validateForm(description, imageUrl)) {
+      fetch(apiUrl + "/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(thing),
+      })
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error("Failed to save thing.");
+          }
         })
-            .then(response => response.json())
-            .then(savedThing => {
-                // Clear the form inputs
-                newForm.reset();
+        .then((savedThing) => {
+          newForm.reset();
+          const card = createThingCard(savedThing);
+          addCardToList(card);
+          newFormWrapper.style.display = "none";
+          searchInput.style.display = "block";
+          document.querySelector(".thing-list").style.display = "flex";
+          hideErrorMessage(); // Hide error message on successful save
+        })
+        .catch((error) => {
+          console.error("Error saving thing:", error);
+          // Display an error message on the page
+          errorMessage.textContent = "Failed to save thing. Please try again.";
+          errorMessage.style.display = "block"; // Show the error message
+        });
+    }
+  });
 
-                // Create a new card for the saved Thing and add it to the thingList
-                const card = createThingCard(savedThing);
-                addCardToList(card);
+  function handleThingDeletion() {
+    const selectedCard = document.querySelector(".thing-card.selected");
 
-                // Hide the new form and show the thing list
-                newFormWrapper.style.display = "none";
-                searchInput.style.display = "block";
-                document.querySelector(".thing-list").style.display = "flex";
-            });
-    });
-
-    // Function to handle Thing deletion
-    function handleThingDeletion() {
-        // Get the selected card
-        const selectedCard = document.querySelector(".thing-card.selected");
-
-        if (selectedCard) {
-            // Get the Thing ID from the card's title attribute
-            const thingId = selectedCard.querySelector("img").getAttribute("title");
-
-            // Confirm before deleting
-            const confirmDelete = confirm("Are you sure you want to delete?");
-            if (confirmDelete) {
-                // Call the delete endpoint
-                fetch(apiUrl + "/delete/" + encodeURIComponent(thingId), {
-                    method: "DELETE"
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            alert("Delete successful.");
-                            // Remove the selected card from the UI
-                            selectedCard.remove();
-                        } else {
-                            alert("Delete failed.");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error deleting thing:", error);
-                        alert("Delete failed. Please try again.");
-                    });
+    if (selectedCard) {
+      const thingId = selectedCard.querySelector("img").getAttribute("title");
+      const confirmDelete = confirm("Are you sure you want to delete?");
+      if (confirmDelete) {
+        fetch(apiUrl + "/delete/" + encodeURIComponent(thingId), {
+          method: "DELETE",
+        })
+          .then((response) => {
+            if (response.ok) {
+              alert("Delete successful.");
+              selectedCard.remove();
+              hideErrorMessage(); // Hide error message on successful delete
+            } else {
+              throw new Error("Failed to delete thing.");
             }
-        } else {
-            alert("Please select a Thing to delete.");
-        }
+          })
+          .catch((error) => {
+            console.error("Error deleting thing:", error);
+            // Display an error message on the page
+            errorMessage.textContent = "Failed to delete thing. Please try again.";
+            errorMessage.style.display = "block"; // Show the error message
+          });
+      }
+    } else {
+      alert("Please select a Thing to delete.");
+    }
+  }
+
+const newButton = document.getElementById("newButton");
+  newButton.addEventListener("click", () => {
+    hideErrorMessage();
+    newFormWrapper.style.display = "block";
+    searchInput.style.display = "none";
+    document.querySelector(".thing-list").style.display = "none";
+  });
+
+  const returnButton = document.getElementById("returnButton");
+  returnButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    hideErrorMessage();
+    newFormWrapper.style.display = "none";
+    searchInput.style.display = "block";
+    document.querySelector(".thing-list").style.display = "flex";
+    newForm.reset(); // Clear form input values
+  });
+
+  function hideErrorMessage() {
+      errorMessage.style.display = "none";
     }
 
-    // Add event listener to the "New" button
-    const newButton = document.getElementById("newButton");
-    const newFormWrapper = document.getElementById("newFormWrapper");
+  document.getElementById("deleteButton").addEventListener("click", handleThingDeletion);
 
-    newButton.addEventListener("click", function () {
-        newFormWrapper.style.display = "block";
-        searchInput.style.display = "none";
-        document.querySelector(".thing-list").style.display = "none";
-    });
-
-    // Add event listener to the "Return" button
-    const returnButton = document.getElementById("returnButton");
-    returnButton.addEventListener("click", function () {
-        newFormWrapper.style.display = "none";
-        searchInput.style.display = "block";
-        document.querySelector(".thing-list").style.display = "flex";
-    });
-
-    // Add event listener to the delete button
-    document.getElementById("deleteButton").addEventListener("click", handleThingDeletion);
-
+    // Function to validate form input
+    function validateForm(description, imageUrl) {
+      if (description.trim() === "" || imageUrl.trim() === "") {
+        errorMessage.textContent = "Please enter description and image URL.";
+        errorMessage.style.display = "block"; // Show the error message
+        return false;
+      }
+      return true;
+    }
 });

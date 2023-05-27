@@ -13,6 +13,8 @@
     <div class="thing-list"></div>
     <div id="newFormWrapper" class="form-wrapper">
         <form id="newForm">
+            <input type="hidden" id="thingId" name="thingId">
+
             <label for="description">Description:</label>
             <input type="text" id="description" name="description" required>
 
@@ -29,6 +31,8 @@
         <button id="deleteButton">Delete</button>
     </div>
 </div>
+
+<div id="errorMessage"></div>
 
 <script src="js/script.js"></script>
 </body>
