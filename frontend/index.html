@@ -7,8 +7,10 @@
 <body>
 <h1>Things List</h1>
 <div class="container">
+    <div id="searchBarWrapper">
+        <label for="searchBar"></label><input type="text" id="searchBar" placeholder="Search by description...">
+    </div>
     <div class="thing-list"></div>
-    <div class="line"></div>
     <div id="newFormWrapper" class="form-wrapper">
         <form id="newForm">
             <label for="description">Description:</label>
@@ -21,11 +23,13 @@
             <button id="returnButton">Return</button>
         </form>
     </div>
+    <div class="line"></div>
+    <div id="buttonWrapper">
+        <button id="newButton">New</button>
+        <button id="deleteButton">Delete</button>
+    </div>
 </div>
-<div id="buttonWrapper">
-    <button id="newButton">New</button>
-    <button id="deleteButton">Delete</button>
-</div>
+
 <script src="js/script.js"></script>
 </body>
 </html>

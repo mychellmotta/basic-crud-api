@@ -9,6 +9,14 @@ h1 {
     text-align: center;
 }
 
+#searchBar {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
 .container {
     display: flex;
     flex-direction: column;

@@ -1,22 +1,39 @@
 const apiUrl = "http://localhost:8080/api/v1/things";
+const searchInput = document.getElementById("searchBar");
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    // Fetch the list of things from the controller
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(things => {
-            document.querySelector(".thing-list");
+    // Fetch the initial list of things
+    fetchThings();
 
-            // Iterate over each thing and create a card
-            things.forEach(thing => {
-                const card = createThingCard(thing);
-                addCardToList(card);
-            });
+    // Add event listener to the search input
+    searchInput.addEventListener("input", function () {
+        const searchTerm = searchInput.value.trim();
+        fetchThings(searchTerm);
+    });
 
-            document.getElementById("newFormWrapper").style.display = things.length > 0 ? "none" : "block";
-        })
-        .catch(error => console.log("Error fetching things:", error));
+    // Function to fetch the list of things based on the search term
+    function fetchThings(searchTerm = "") {
+        let url = apiUrl;
+        if (searchTerm !== "") {
+            url += "/findByDescription/" + encodeURIComponent(searchTerm);
+        }
+
+        // Fetch the list of things from the controller
+        fetch(url)
+            .then(response => response.json())
+            .then(things => {
+                const thingList = document.querySelector(".thing-list");
+                thingList.innerHTML = "";
+
+                // Iterate over each thing and create a card
+                things.forEach(thing => {
+                    const card = createThingCard(thing);
+                    addCardToList(card);
+                });
+            })
+            .catch(error => console.log("Error fetching things:", error));
+    }
 
     // Function to create a new Thing card
     function createThingCard(thing) {
@@ -102,6 +119,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // Hide the new form and show the thing list
                 newFormWrapper.style.display = "none";
+                searchInput.style.display = "block";
                 document.querySelector(".thing-list").style.display = "flex";
             });
     });
@@ -147,6 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     newButton.addEventListener("click", function () {
         newFormWrapper.style.display = "block";
+        searchInput.style.display = "none";
         document.querySelector(".thing-list").style.display = "none";
     });
 
@@ -154,6 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const returnButton = document.getElementById("returnButton");
     returnButton.addEventListener("click", function () {
         newFormWrapper.style.display = "none";
+        searchInput.style.display = "block";
         document.querySelector(".thing-list").style.display = "flex";
     });
 
