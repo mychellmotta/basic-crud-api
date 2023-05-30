@@ -3,6 +3,7 @@
 <head>
     <title>Things List</title>
     <link rel="stylesheet" href="css/stylesheet.css">
+    <link href="https://fonts.cdnfonts.com/css/chirp-2" rel="stylesheet">
 </head>
 <body>
 <h1>Things List</h1>
@@ -12,7 +13,7 @@
     </div>
     <div class="thing-list"></div>
     <div id="newFormWrapper" class="form-wrapper">
-        <form id="newForm">
+        <form id="newForm" class="new-form">
             <input type="hidden" id="thingId" name="thingId">
 
             <label for="description">Description:</label>
@@ -23,6 +24,11 @@
 
             <input type="submit" value="Save">
             <button id="returnButton">Return</button>
+            <button id="saveFromSheetButton" class="sheet-button"><img src="static/img/excel-file.png"
+                                                                       alt="Sheet"
+            title=".xls or .xlsx"> ...save from sheet
+                <input type="file" id="fileInput" accept=".xls,.xlsx" style="display: none;">
+            </button>
         </form>
     </div>
     <div class="line"></div>

@@ -59,16 +59,25 @@ public class ThingService {
         return repository.save(existingThing);
     }
 
-    public List<ThingSheetDto> getListFromExcel(MultipartFile multipartfile) {
-        File file;
+    public List<ThingSheetDto> getListFromExcel(MultipartFile multipartFile) {
+        if (multipartFile == null) {
+            throw new IllegalArgumentException("input multipartfile cannot be null");
+        }
+
+        File file = null;
         try {
-            file = convertMultiPartToFile(multipartfile);
+            file = convertMultiPartToFile(multipartFile);
+
+            // TODO: do the logic here and return to controller the list of Things
+
+            return Poiji.fromExcel(file, ThingSheetDto.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
         }
-        // TODO: do the logic here and return to controller the list of Things
-
-        return Poiji.fromExcel(file, ThingSheetDto.class);
     }
 
     @Transactional

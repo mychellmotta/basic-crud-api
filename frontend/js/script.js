@@ -5,6 +5,8 @@ const descriptionInput = document.getElementById("description");
 const imageUrlInput = document.getElementById("imageUrl");
 const newFormWrapper = document.getElementById("newFormWrapper");
 const buttonWrapper = document.getElementById("buttonWrapper");
+const uploadForm = document.getElementById("uploadForm");
+const fileInput = document.getElementById('fileInput');
 
 document.addEventListener("DOMContentLoaded", () => {
   fetchThings();
@@ -266,4 +268,47 @@ const newButton = document.getElementById("newButton");
       }
       return true;
     }
+
+  // Add an event listener to the saveFromSheetButton
+    document.getElementById('saveFromSheetButton').addEventListener('click', function() {
+      // Simulate a click on the file input element
+      fileInput.click();
+    });
+
+    // Handle the file selection event
+    fileInput.addEventListener('change', function(event) {
+      const file = event.target.files[0]; // Get the selected file
+
+      // Create a FormData object
+      const formData = new FormData();
+      formData.append('file', file); // Append the file to the form data
+
+      // Send the file to the backend using an AJAX request
+      fetch(apiUrl + '/saveFromExcel', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Failed to save things from Excel.');
+        }
+      })
+      .then(things => {
+        fetchThings();
+        resetForm();
+        newFormWrapper.style.display = "none";
+        searchInput.style.display = "block";
+        document.querySelector(".thing-list").style.display = "flex";
+        buttonWrapper.style.display = "flex"; // Show the button wrapper
+        hideErrorMessage(); // Hide error message on successful save
+      })
+      .catch(error => {
+        console.error('Error saving things from Excel:', error);
+        // Display an error message on the page
+        errorMessage.textContent = 'Failed to save things from Excel. Please try again.';
+        errorMessage.style.display = 'block'; // Show the error message
+      });
+    });
 });
