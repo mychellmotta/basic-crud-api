@@ -42,6 +42,7 @@ h1 {
 }
 
 .thing-card {
+    position: relative;
     border: 1px solid #ccc;
     padding: 10px;
     border-radius: 5px;
@@ -69,6 +70,17 @@ h1 {
     box-shadow: 0 0 5px 2px #0000FF; /* Add a blue box shadow to the selected card */
     transform: scale(1.05); /* Scale up the selected card slightly */
     transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out; /* Add a smooth transition effect */
+}
+
+.thing-card .edit-button {
+  position: absolute;
+  bottom: 10px; /* Adjust the distance from the bottom */
+  right: 10px; /* Adjust the distance from the right */
+  width: 20px; /* Adjust the width of the edit button image */
+  height: 20px; /* Adjust the height of the edit button image */
+  cursor: pointer;
+  padding: 3px; /* Add padding */
+  border-radius: 0; /* Remove the circular border radius */
 }
 
 #buttonWrapper {

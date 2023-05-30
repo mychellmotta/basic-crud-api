@@ -4,6 +4,7 @@ const errorMessage = document.getElementById("errorMessage");
 const descriptionInput = document.getElementById("description");
 const imageUrlInput = document.getElementById("imageUrl");
 const newFormWrapper = document.getElementById("newFormWrapper");
+const buttonWrapper = document.getElementById("buttonWrapper");
 
 document.addEventListener("DOMContentLoaded", () => {
   fetchThings();
@@ -42,16 +43,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const card = document.createElement("div");
     card.className = "thing-card";
 
+    const editButton = document.createElement("img");
+      editButton.src = "static/img/edit-btn.svg";
+      editButton.className = "edit-button";
+      editButton.title = "Edit";
+      editButton.addEventListener("click", (event) => {
+        event.stopPropagation(); // Prevent the card click event from triggering
+        handleEditButtonClick(thing);
+      });
+
     const description = document.createElement("p");
     description.textContent = thing.description;
 
     const image = document.createElement("img");
     image.title = thing.id;
+    card.setAttribute("data-thing-id", thing.id);
     image.addEventListener("error", () => {
       image.src = "static/img/noimage.jpg";
     });
     image.src = thing.imageUrl;
 
+    card.appendChild(editButton);
     card.appendChild(description);
     card.appendChild(image);
 
@@ -62,12 +74,32 @@ document.addEventListener("DOMContentLoaded", () => {
     return card;
   }
 
+  function handleEditButtonClick(thing) {
+    // Populate form fields with Thing data
+    descriptionInput.value = thing.description;
+    imageUrlInput.value = thing.imageUrl;
+
+    // Set the Thing ID as a data attribute on the form
+    newForm.setAttribute("data-thing-id", thing.id);
+
+    // Show the form for editing
+    newFormWrapper.style.display = "block";
+    searchInput.style.display = "none";
+    document.querySelector(".thing-list").style.display = "none";
+    buttonWrapper.style.display = "none"; // Hide the button wrapper
+  }
+
   function handleCardSelection(card) {
+    const isSelected = card.classList.contains("selected");
+
     const thingCards = document.querySelectorAll(".thing-card");
     thingCards.forEach((c) => {
       c.classList.remove("selected");
     });
-    card.classList.add("selected");
+
+    if (!isSelected) {
+      card.classList.add("selected");
+    }
   }
 
   function addCardToList(card) {
@@ -80,50 +112,99 @@ document.addEventListener("DOMContentLoaded", () => {
     event.preventDefault();
     const description = descriptionInput.value;
     const imageUrl = imageUrlInput.value;
-    const thing = {
-      description,
-      imageUrl,
-    };
+    const thingId = newForm.getAttribute("data-thing-id");
 
     // Validate form input
     if (validateForm(description, imageUrl)) {
-      fetch(apiUrl + "/save", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(thing),
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error("Failed to save thing.");
-          }
+      const thing = {
+        description,
+        imageUrl,
+      };
+
+      if (thingId) {
+        // Update existing Thing
+        fetch(apiUrl + `/update/${encodeURIComponent(thingId)}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(thing),
         })
-        .then((savedThing) => {
-          newForm.reset();
-          const card = createThingCard(savedThing);
-          addCardToList(card);
-          newFormWrapper.style.display = "none";
-          searchInput.style.display = "block";
-          document.querySelector(".thing-list").style.display = "flex";
-          hideErrorMessage(); // Hide error message on successful save
+            .then((response) => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                throw new Error("Failed to update thing.");
+              }
+            })
+            .then((updatedThing) => {
+              // Update the card in the UI with the updated Thing data
+              const card = createThingCard(updatedThing);
+              const existingCard = document.querySelector(
+                  `.thing-card[data-thing-id="${thingId}"]`
+              );
+              existingCard.replaceWith(card);
+              resetForm();
+              newFormWrapper.style.display = "none";
+              searchInput.style.display = "block";
+              document.querySelector(".thing-list").style.display = "flex";
+              buttonWrapper.style.display = "flex"; // Show the button wrapper
+              hideErrorMessage(); // Hide error message on successful update
+            })
+            .catch((error) => {
+              console.error("Error updating thing:", error);
+              // Display an error message on the page
+              errorMessage.textContent =
+                  "Failed to update thing. Please try again.";
+              errorMessage.style.display = "block"; // Show the error message
+            });
+      } else {
+        // Create new Thing
+        fetch(apiUrl + "/save", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(thing),
         })
-        .catch((error) => {
-          console.error("Error saving thing:", error);
-          // Display an error message on the page
-          errorMessage.textContent = "Failed to save thing. Please try again.";
-          errorMessage.style.display = "block"; // Show the error message
-        });
+            .then((response) => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                throw new Error("Failed to save thing.");
+              }
+            })
+            .then((savedThing) => {
+              const card = createThingCard(savedThing);
+              addCardToList(card);
+              resetForm();
+              newFormWrapper.style.display = "none";
+              searchInput.style.display = "block";
+              document.querySelector(".thing-list").style.display = "flex";
+              buttonWrapper.style.display = "flex"; // Show the button wrapper
+              hideErrorMessage(); // Hide error message on successful save
+            })
+            .catch((error) => {
+              console.error("Error saving thing:", error);
+              // Display an error message on the page
+              errorMessage.textContent =
+                  "Failed to save thing. Please try again.";
+              errorMessage.style.display = "block"; // Show the error message
+            });
+      }
     }
   });
+
+  function resetForm() {
+    newForm.removeAttribute("data-thing-id");
+    newForm.reset(); // Clear form input values
+  }
 
   function handleThingDeletion() {
     const selectedCard = document.querySelector(".thing-card.selected");
 
     if (selectedCard) {
-      const thingId = selectedCard.querySelector("img").getAttribute("title");
+      const thingId = selectedCard.getAttribute("data-thing-id");
       const confirmDelete = confirm("Are you sure you want to delete?");
       if (confirmDelete) {
         fetch(apiUrl + "/delete/" + encodeURIComponent(thingId), {
@@ -156,6 +237,7 @@ const newButton = document.getElementById("newButton");
     newFormWrapper.style.display = "block";
     searchInput.style.display = "none";
     document.querySelector(".thing-list").style.display = "none";
+    buttonWrapper.style.display = "none"; // Hide the button wrapper
   });
 
   const returnButton = document.getElementById("returnButton");
@@ -165,7 +247,8 @@ const newButton = document.getElementById("newButton");
     newFormWrapper.style.display = "none";
     searchInput.style.display = "block";
     document.querySelector(".thing-list").style.display = "flex";
-    newForm.reset(); // Clear form input values
+    resetForm(); // Clear form input values
+    buttonWrapper.style.display = "flex"; // Show the button wrapper
   });
 
   function hideErrorMessage() {
