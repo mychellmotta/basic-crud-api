@@ -17,6 +17,7 @@ public class Thing {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    @Column(name = "description", unique = true)
     private String description;
     @Column(name = "image_url")
     private String imageUrl;

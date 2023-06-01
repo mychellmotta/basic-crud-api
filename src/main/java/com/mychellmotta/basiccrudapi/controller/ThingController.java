@@ -1,9 +1,7 @@
 package com.mychellmotta.basiccrudapi.controller;
 
 import com.mychellmotta.basiccrudapi.model.Thing;
-import com.mychellmotta.basiccrudapi.service.EmailService;
 import com.mychellmotta.basiccrudapi.service.ThingService;
-import jakarta.mail.MessagingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -19,11 +17,9 @@ import java.util.UUID;
 public class ThingController {
 
     private final ThingService thingService;
-    private final EmailService emailService;
 
-    public ThingController(ThingService thingService, EmailService emailService) {
+    public ThingController(ThingService thingService) {
         this.thingService = thingService;
-        this.emailService = emailService;
     }
 
     @GetMapping
@@ -38,9 +34,9 @@ public class ThingController {
         return new ResponseEntity<>(thing, HttpStatus.OK);
     }
 
-    @GetMapping("/findByDescription/{description}")
+    @GetMapping("/findAllWithDescription/{description}")
     public ResponseEntity<List<Thing>> findByDescription(@PathVariable("description") String description) {
-        var things = thingService.findByDescription(description);
+        var things = thingService.findAllWithDescription(description);
         return new ResponseEntity<>(things, HttpStatus.OK);
     }
 
@@ -70,14 +66,5 @@ public class ThingController {
     public ResponseEntity<?> delete(@PathVariable("id") UUID id) {
         thingService.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    public void sendEmail(String message) {
-        //  testing the email function
-        try {
-            emailService.sendEmail(message);
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

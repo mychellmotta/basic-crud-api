@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface ThingRepository extends JpaRepository<Thing, UUID> {
     @Query("SELECT t FROM Thing t WHERE t.description LIKE %?1%")
-    List<Thing> hasDescription(String description);
+    List<Thing> findAllWithDescription(String description);
 
     Optional<Thing> findByDescription(String description);
 }

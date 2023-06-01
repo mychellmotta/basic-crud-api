@@ -5,7 +5,6 @@ const descriptionInput = document.getElementById("description");
 const imageUrlInput = document.getElementById("imageUrl");
 const newFormWrapper = document.getElementById("newFormWrapper");
 const buttonWrapper = document.getElementById("buttonWrapper");
-const uploadForm = document.getElementById("uploadForm");
 const fileInput = document.getElementById('fileInput');
 
 document.addEventListener("DOMContentLoaded", () => {
