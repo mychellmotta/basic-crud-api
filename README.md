@@ -15,8 +15,9 @@ This is a basic CRUD REST API being made with Java 17, Spring Boot and in-memory
   
 * [PUT] Update an entity passing the ID as a parameter (JSON format with 'description' and 'imageUrl' fields): http://localhost:8080/api/v1/things/update/{id}
 * [DELETE] Delete an entity by its ID (type: UUID): http://localhost:8080/api/v1/things/delete/{id}
+* Send email on transactional actions (save, update, delete)
+  - Configure the email in application.properties and set the EMAIL_TO and EMAIL_FROM variables in EmailService
 
 ### To do:
 
-* Send email on transactional actions such as saving and deleting
 * Store the imageUrl in Amazon S3

@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function fetchThings(searchTerm = "") {
     let url = apiUrl;
     if (searchTerm !== "") {
-      url += `/findByDescription/${encodeURIComponent(searchTerm)}`;
+      url += `/findAllWithDescription/${encodeURIComponent(searchTerm)}`;
     }
 
     fetch(url)

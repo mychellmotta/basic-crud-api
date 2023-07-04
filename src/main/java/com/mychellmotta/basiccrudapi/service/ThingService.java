@@ -3,7 +3,6 @@ package com.mychellmotta.basiccrudapi.service;
 import com.mychellmotta.basiccrudapi.dto.ThingSheetDto;
 import com.mychellmotta.basiccrudapi.model.Thing;
 import com.mychellmotta.basiccrudapi.repository.ThingRepository;
-import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,12 +15,10 @@ public class ThingService {
 
     private final ThingRepository repository;
     private final FileService fileService;
-    private final EmailService emailService;
 
-    public ThingService(ThingRepository repository, FileService fileService, EmailService emailService) {
+    public ThingService(ThingRepository repository, FileService fileService) {
         this.repository = repository;
         this.fileService = fileService;
-        this.emailService = emailService;
     }
 
     public List<Thing> findAll() {
@@ -71,14 +68,5 @@ public class ThingService {
     public void delete(UUID id) {
         var thing = findById(id);
         repository.delete(thing);
-    }
-
-    private void sendEmail(String message) {
-        //  testing the email function
-        try {
-            emailService.sendEmail(message);
-        } catch (MessagingException e) {
-            throw new RuntimeException("error sending the email: " + e.getMessage(), e);
-        }
     }
 }
