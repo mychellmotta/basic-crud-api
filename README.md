@@ -1,6 +1,6 @@
 # BASIC CRUD API
 
-This is a basic CRUD REST API being made with Java 17, Spring Boot and in-memory database H2 for learning purposes.
+This is a basic CRUD REST API being made with Java 17, Spring Boot and in-memory database H2 for learning purposes. The front-end is a basic vanilla JavaScript page, made with the help of ChatGPT.
 
 ### What's working:
 
