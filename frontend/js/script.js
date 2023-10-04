@@ -213,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
           .then((response) => {
             if (response.ok) {
-              alert("Delete successful.");
+              alert("Successfully deleted!");
               selectedCard.remove();
               hideErrorMessage(); // Hide error message on successful delete
             } else {
